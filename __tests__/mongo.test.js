@@ -1,0 +1,66 @@
+const {initLogging} = require("../src/logging");
+const {GenericContainer, Wait} = require("testcontainers");
+const path = require("node:path");
+const {generateConfig} = require("../src/config");
+const MongoWrapper = require("../src/mongo");
+const {MongoClient} = require("mongodb");
+
+const MAPPED_PORT = 27017;
+const USER = "root";
+const PASS = "rootpass";
+
+describe("mongoDB container IT", () => {
+    let container;
+    let config;
+    let client;
+
+    beforeAll(async () => {
+        await initLogging({level: "none"});
+
+        container = await new GenericContainer("mongo:5.0")
+            .withExposedPorts(MAPPED_PORT)
+            .withEnvironment({
+                "MONGO_INITDB_ROOT_USERNAME": USER,
+                "MONGO_INITDB_ROOT_PASSWORD": PASS,
+            })
+            .withStartupTimeout(10000)
+            .withWaitStrategy(Wait.forLogMessage("Waiting for connections"))
+            .start();
+
+        config = await generateConfig();
+        config.mongodb.connectionUrl = `mongodb://${USER}:${PASS}@${container.getHost()}:${container.getMappedPort(MAPPED_PORT)}/?retryWrites=true&w=majority`;
+
+        client = new MongoClient(config.mongodb.connectionUrl);
+    });
+
+    afterAll(async () => {
+        await container.stop();
+    });
+
+    beforeEach(async () => {
+        await client.connect();
+    });
+
+    afterEach(async () => {
+        await client.close();
+    });
+
+    test("can update history", async () => {
+        const wrapper = new MongoWrapper(config);
+
+        const name = "name1";
+        const size = 2;
+        const isMedia = true;
+
+        await wrapper.updateHistory([{name, size, isMedia}]);
+
+        const database = client.db(config.mongodb.database);
+        const collection = database.collection(config.mongodb.downloadCollection);
+
+        expect(await collection.countDocuments()).toBe(1);
+
+        const doc = await collection.findOne();
+        expect(doc.file_name).toBe(name);
+        expect(doc.file_size).toBe(size);
+    });
+});

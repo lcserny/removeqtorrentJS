@@ -1,0 +1,26 @@
+log:
+  level: info
+  file: "removeqtorrent.log.json"
+
+video:
+  mimeTypes:
+    - "video/x-matroska"
+    - "video/x-msvideo"
+    - "video/mp4"
+    - "video/x-flv"
+    - "video/quicktime"
+    - "video/x-ms-wmv"
+    - "video/vnd.dlna.mpeg-tts"
+    - "application/x-matroska"
+
+mongodb:
+  connectionUrl: "mongo://changeMe"
+  database: "videosmover"
+  downloadCollection: "download_cache"
+  
+torrents:
+  webUi:
+    baseUrl: "<qTorrentBaseUrl>"
+    username: "admin"
+    password: "adminadmin"
+    downloadRootPath: "/tmp"
