@@ -114,12 +114,15 @@ class QBitTorrentHandler {
 
 function isVideo(filePath, videoMimeTypes) {
     const fileMime = mime.lookup(filePath);
-    for (let allowedMime of videoMimeTypes) {
-        if (allowedMime === fileMime) {
-            return true;
+    if (fileMime) {
+        for (let allowedMime of videoMimeTypes) {
+            if (allowedMime === fileMime) {
+                return true;
+            }
         }
+        return fileMime.startsWith("video/");
     }
-    return fileMime.startsWith("video/");
+    return false;
 }
 
 module.exports = QBitTorrentHandler;
