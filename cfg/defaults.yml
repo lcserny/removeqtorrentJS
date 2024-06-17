@@ -1,6 +1,7 @@
 log:
   level: info
-  file: "removeqtorrent.log.json"
+  file: "removeqtorrent.log"
+  json: false
 
 video:
   mimeTypes:
