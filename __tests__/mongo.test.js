@@ -63,4 +63,22 @@ describe("mongoDB container IT", () => {
         expect(doc.file_name).toBe(name);
         expect(doc.file_size).toBe(size);
     });
+
+    test("non-media is not updated in history", async () => {
+        const wrapper = new MongoWrapper(config);
+
+        const name = "nonMedia";
+        const size = 2;
+        const isMedia = false;
+
+        await wrapper.updateHistory([{name, size, isMedia}]);
+
+        const database = client.db(config.mongodb.database);
+        const collection = database.collection(config.mongodb.downloadCollection);
+
+        expect(await collection.countDocuments({
+            file_name: name,
+            file_size: size
+        })).toBe(0);
+    });
 });

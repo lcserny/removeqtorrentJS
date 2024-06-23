@@ -29,7 +29,7 @@ class MongoWrapper {
                 return video;
             });
 
-        if (!videos) {
+        if (videos == null || videos.length < 1) {
             logger.info("No media files found to insert in cache");
             return;
         }
