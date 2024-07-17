@@ -1,17 +1,17 @@
-const {GenericContainer, Wait} = require("testcontainers")
-const path = require("node:path");
-const {generateConfig} = require("../src/config");
-const TorrentHandler = require("../src/qbittorrent");
-const {initLogging} = require("../src/logging");
+import {GenericContainer, StartedTestContainer, Wait} from "testcontainers";
+import * as path from "node:path";
+import {generateConfig, Config} from "../src/config";
+import {QBitTorrentHandler} from "../src/qbittorrent";
+import {initLogging, LogConfig} from "../src/logging";
 
 const MAPPED_PORT = 8080;
 
 describe("qbittorrent container IT", () => {
-    let container;
-    let config;
+    let container: StartedTestContainer;
+    let config: Config;
 
     beforeAll(async () => {
-        await initLogging({level: "none"});
+        initLogging(new LogConfig("none"));
 
         container = await new GenericContainer("linuxserver/qbittorrent:4.5.2")
             .withExposedPorts(MAPPED_PORT)
@@ -32,14 +32,14 @@ describe("qbittorrent container IT", () => {
     });
 
     test("TorrentHandler can generate SID", async () => {
-        const handler = new TorrentHandler(config);
+        const handler = new QBitTorrentHandler(config);
         let sid = await handler.generateSid();
         expect(sid).not.toBeNull();
         expect(sid.length > 0).toBeTruthy();
     });
 
     test("TorrentHandler can delete torrent by hash", async () => {
-        const handler = new TorrentHandler(config);
+        const handler = new QBitTorrentHandler(config);
         let sid = await handler.generateSid();
 
         await handler.addTorrent(sid, path.join(__dirname, "resources", "ubuntu-server.iso.torrent"));

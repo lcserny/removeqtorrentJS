@@ -1,6 +1,6 @@
-const { program } = require('commander');
+import {OptionValues, program} from "commander";
 
-function processArgs() {
+export function processArgs(): OptionValues {
     program
         .name("removeqtorrent")
         .description("CLI to remove QBitTorrent torrents")
@@ -10,8 +10,4 @@ function processArgs() {
     program.parse();
 
     return program.opts();
-}
-
-module.exports = {
-    processArgs
 }

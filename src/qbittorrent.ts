@@ -1,25 +1,45 @@
-const {logger} = require("./logging");
-const axios = require("axios");
-const {AxiosHeaders} = require("axios");
-const mime = require('mime-types');
-const path = require("node:path");
-const fs = require("node:fs");
+import {logger} from "./logging";
+import axios, {AxiosHeaders} from "axios";
+import mime from "mime-types";
+import path from "node:path";
+import fs from "node:fs";
+import {Config} from "./config";
 
 axios.defaults.timeout = 5000;
 
-class TorrentFile {
-    name;
-    size;
-    isMedia;
+export class WebUIConfig {
+    constructor(public baseUrl: string,
+                public username: string,
+                public password: string,
+                public downloadRootPath: string) {
+    }
 }
 
-class TorrentInfo {
-    hash;
+export class TorrentsConfig {
+    constructor(public webUi: WebUIConfig) {
+    }
 }
 
+export class TorrentFile {
+    constructor(public name: string, public size: number, public isMedia: boolean) {
+    }
+}
 
-class QBitTorrentHandler {
-    constructor(config) {
+export class TorrentInfo {
+    constructor(public hash: string) {
+    }
+}
+
+export class QBitTorrentHandler {
+    private readonly videoMimeTypes: string[];
+    private webUi: WebUIConfig;
+    private readonly loginUrl: string;
+    private readonly torrentFilesUrl: string;
+    private readonly torrentDeleteUrl: string;
+    private readonly torrentAddUrl: string;
+    private readonly torrentInfoUrl: string;
+
+    constructor(config: Config) {
         this.videoMimeTypes = config.video.mimeTypes;
         this.webUi = config.torrents.webUi;
         this.loginUrl = `${this.webUi.baseUrl}/api/v2/auth/login`;
@@ -29,7 +49,7 @@ class QBitTorrentHandler {
         this.torrentInfoUrl = `${this.webUi.baseUrl}/api/v2/torrents/info`;
     }
 
-    async generateSid() {
+    async generateSid(): Promise<string> {
         const response = await axios.postForm(this.loginUrl, {
             username: this.webUi.username,
             password: this.webUi.password,
@@ -46,7 +66,7 @@ class QBitTorrentHandler {
         return sid;
     }
 
-    async listTorrents(sid, hash) {
+    async listTorrents(sid: string, hash: string): Promise<TorrentFile[]> {
         const headers = new AxiosHeaders();
         headers.set("cookie", `SID=${sid}`);
 
@@ -56,14 +76,10 @@ class QBitTorrentHandler {
         );
 
         const torrents = response.data
-            .map((data) => {
-                const torrent = new TorrentFile();
-                torrent.name = data.name;
-                torrent.size = data.size;
-
+            .map((data: any) => {
+                const torrent = new TorrentFile(data.name, data.size, false);
                 const filePath = path.join(this.webUi.downloadRootPath, torrent.name);
                 torrent.isMedia = isVideo(filePath, this.videoMimeTypes);
-
                 return torrent;
             });
 
@@ -71,7 +87,7 @@ class QBitTorrentHandler {
         return torrents;
     }
 
-    async delete(sid, hash, removeFiles) {
+    async delete(sid: string, hash: string, removeFiles: boolean) {
         const headers = new AxiosHeaders();
         headers.set("cookie", `SID=${sid}`);
 
@@ -83,7 +99,7 @@ class QBitTorrentHandler {
         logger.info(`Deleted torrent with hash: '${hash}'`);
     }
 
-    async addTorrent(sid, torrentFile) {
+    async addTorrent(sid: string, torrentFile: string) {
         const headers = new AxiosHeaders();
         headers.set("cookie", `SID=${sid}`);
         headers.setContentType("multipart/form-data");
@@ -94,25 +110,20 @@ class QBitTorrentHandler {
         );
     }
 
-    async getInfo(sid) {
+    async getInfo(sid: string): Promise<TorrentInfo[]> {
         const headers = new AxiosHeaders();
         headers.set("cookie", `SID=${sid}`);
 
         const response = await axios.postForm(this.torrentInfoUrl, null,{ headers: headers } );
 
-        const torrents = response.data
-            .map((data) => {
-                const torrent = new TorrentInfo();
-                torrent.hash = data.hash;
-                return torrent;
-            });
+        const torrents = response.data.map((data: any) => new TorrentInfo(data.hash));
 
         logger.info(`Torrent info retrieved: ${JSON.stringify(torrents)}`);
         return torrents;
     }
 }
 
-function isVideo(filePath, videoMimeTypes) {
+function isVideo(filePath: string, videoMimeTypes: string[]) : boolean {
     const fileMime = mime.lookup(filePath);
     if (fileMime) {
         for (let allowedMime of videoMimeTypes) {
@@ -124,5 +135,3 @@ function isVideo(filePath, videoMimeTypes) {
     }
     return false;
 }
-
-module.exports = QBitTorrentHandler;

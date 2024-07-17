@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const {initLogging, logger} = require("../logging");
-const {processArgs} = require("../args");
-const {generateConfig} = require("../config");
-const HistoryUpdater = require("../history");
-const MongoWrapper = require("../mongo");
-const QBitTorrentHandler = require("../qbittorrent");
+import {initLogging, logger} from "../logging";
+import {processArgs} from "../args";
+import {generateConfig} from "../config";
+import {HistoryClient, HistoryUpdater} from "../history";
+import {MongoWrapper} from "../mongo";
+import {QBitTorrentHandler} from "../qbittorrent";
 
 async function main() {
     const args = processArgs();
@@ -19,7 +19,7 @@ async function main() {
         logger.info(`Hash received: '${hash}'`);
 
         const torrentHandler = new QBitTorrentHandler(config);
-        const mongoWrapper = new MongoWrapper(config);
+        const mongoWrapper: HistoryClient = new MongoWrapper(config);
         const historyUpdater = new HistoryUpdater(mongoWrapper);
 
         const sid = await torrentHandler.generateSid();
@@ -30,7 +30,7 @@ async function main() {
         ]);
 
         logger.info("Command completed successfully");
-    } catch (error) {
+    } catch (error: any) {
         logger.error(error.stack);
     }
 }

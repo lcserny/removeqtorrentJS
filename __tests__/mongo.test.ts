@@ -1,21 +1,20 @@
-const {initLogging} = require("../src/logging");
-const {GenericContainer, Wait} = require("testcontainers");
-const path = require("node:path");
-const {generateConfig} = require("../src/config");
-const MongoWrapper = require("../src/mongo");
-const {MongoClient} = require("mongodb");
+import {initLogging, LogConfig} from "../src/logging";
+import {GenericContainer, StartedTestContainer, Wait} from "testcontainers";
+import {generateConfig, Config} from "../src/config";
+import {MongoWrapper} from "../src/mongo";
+import {MongoClient} from "mongodb";
 
 const MAPPED_PORT = 27017;
 const USER = "root";
 const PASS = "rootpass";
 
 describe("mongoDB container IT", () => {
-    let container;
-    let config;
-    let client;
+    let container: StartedTestContainer;
+    let config: Config;
+    let client: MongoClient;
 
     beforeAll(async () => {
-        await initLogging({level: "none"});
+        initLogging(new LogConfig("none"));
 
         container = await new GenericContainer("mongo:5.0")
             .withExposedPorts(MAPPED_PORT)
@@ -60,8 +59,8 @@ describe("mongoDB container IT", () => {
         expect(await collection.countDocuments()).toBe(1);
 
         const doc = await collection.findOne();
-        expect(doc.file_name).toBe(name);
-        expect(doc.file_size).toBe(size);
+        expect(doc?.file_name).toBe(name);
+        expect(doc?.file_size).toBe(size);
     });
 
     test("non-media is not updated in history", async () => {
