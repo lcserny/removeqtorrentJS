@@ -1,4 +1,4 @@
-import {initLogging, LogConfig} from "../src/logging";
+import {initLogging} from "../src/logging";
 import {GenericContainer, StartedTestContainer, Wait} from "testcontainers";
 import {generateConfig, Config} from "../src/config";
 import {MongoWrapper} from "../src/mongo";
@@ -14,7 +14,7 @@ describe("mongoDB container IT", () => {
     let client: MongoClient;
 
     beforeAll(async () => {
-        initLogging(new LogConfig("none"));
+        initLogging({level: "none"});
 
         container = await new GenericContainer("mongo:5.0")
             .withExposedPorts(MAPPED_PORT)

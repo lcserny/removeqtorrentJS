@@ -4,16 +4,16 @@ import {logger} from "./logging";
 import {Config} from "./config";
 import {TorrentFile} from "./qbittorrent";
 
-export class MongoDBConfig {
-    constructor(public connectionUrl: string, public database: string, public downloadCollection: string) {
-    }
+export interface MongoDBConfig {
+    connectionUrl: string
+    database: string;
+    downloadCollection: string;
 }
 
-class MongoVideo {
-    constructor(public file_name: string,
-                public file_size: number,
-                public date_downloaded: Date) {
-    }
+interface MongoVideo {
+    file_name: string;
+    file_size: number;
+    date_downloaded: Date;
 }
 
 export class MongoWrapper implements HistoryClient{
@@ -31,9 +31,9 @@ export class MongoWrapper implements HistoryClient{
         const database = this.mongoClient.db(this.mongoConfig.database);
         const collection = database.collection(this.mongoConfig.downloadCollection);
 
-        const videos = torrentFiles
+        const videos: MongoVideo[] = torrentFiles
             .filter(torrent => torrent.isMedia)
-            .map((torrent) => new MongoVideo(torrent.name, torrent.size, new Date()));
+            .map((torrent) => ({file_name: torrent.name, file_size: torrent.size, date_downloaded: new Date()}));
 
         if (videos == null || videos.length < 1) {
             logger.info("No media files found to insert in cache");

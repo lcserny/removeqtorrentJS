@@ -7,35 +7,24 @@ import {Config} from "./config";
 
 axios.defaults.timeout = 5000;
 
-export class WebUIConfig {
-    constructor(public baseUrl: string,
-                public username: string,
-                public password: string,
-                public downloadRootPath: string) {
-    }
+export interface WebUIConfig {
+    baseUrl: string;
+    username: string;
+    password: string;
+    downloadRootPath: string;
 }
 
-export class TorrentsConfig {
-    constructor(public webUi: WebUIConfig) {
-    }
+export interface TorrentsConfig {
+    webUi: WebUIConfig;
 }
 
-export class TorrentFile {
-    constructor(public name: string, public size: number, public isMedia: boolean) {
-    }
-}
-
-export class TorrentInfo {
-    constructor(public hash: string) {
-    }
-}
-
-interface NameSize {
+export interface TorrentFile {
     name: string;
     size: number;
+    isMedia?: boolean;
 }
 
-interface HashHolder {
+export interface TorrentInfo {
     hash: string;
 }
 
@@ -79,14 +68,13 @@ export class QBitTorrentHandler {
         const headers = new AxiosHeaders();
         headers.set("cookie", `SID=${sid}`);
 
-        const response = await axios.postForm<NameSize[]>(this.torrentFilesUrl,
+        const response = await axios.postForm<TorrentFile[]>(this.torrentFilesUrl,
             {hash: hash},
             {headers: headers}
         );
 
         const torrents = response.data
-            .map((data: NameSize) => {
-                const torrent = new TorrentFile(data.name, data.size, false);
+            .map((torrent: TorrentFile) => {
                 const filePath = path.join(this.webUi.downloadRootPath, torrent.name);
                 torrent.isMedia = isVideo(filePath, this.videoMimeTypes);
                 return torrent;
@@ -123,9 +111,8 @@ export class QBitTorrentHandler {
         const headers = new AxiosHeaders();
         headers.set("cookie", `SID=${sid}`);
 
-        const response = await axios.postForm<HashHolder[]>(this.torrentInfoUrl, null,{ headers: headers } );
-
-        const torrents = response.data.map((data: HashHolder) => new TorrentInfo(data.hash));
+        const response = await axios.postForm<TorrentInfo[]>(this.torrentInfoUrl, null,{ headers: headers } );
+        const torrents = response.data;
 
         logger.info(`Torrent info retrieved: ${JSON.stringify(torrents)}`);
         return torrents;

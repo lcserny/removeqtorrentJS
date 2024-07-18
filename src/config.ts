@@ -6,17 +6,15 @@ import {LogConfig} from "./logging";
 import {MongoDBConfig} from "./mongo";
 import {TorrentsConfig} from "./qbittorrent";
 
-export class VideoConfig {
-    constructor(public mimeTypes: string[]) {
-    }
+export interface VideoConfig {
+    mimeTypes: string[];
 }
 
-export class Config {
-    constructor(public log: LogConfig,
-                public video: VideoConfig,
-                public mongodb: MongoDBConfig,
-                public torrents: TorrentsConfig) {
-    }
+export interface Config {
+    log: LogConfig;
+    video: VideoConfig;
+    mongodb: MongoDBConfig;
+    torrents: TorrentsConfig;
 }
 
 export async function generateConfig(configFile: string = ""): Promise<Config> {

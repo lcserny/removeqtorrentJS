@@ -2,7 +2,7 @@ import {GenericContainer, StartedTestContainer, Wait} from "testcontainers";
 import * as path from "node:path";
 import {generateConfig, Config} from "../src/config";
 import {QBitTorrentHandler} from "../src/qbittorrent";
-import {initLogging, LogConfig} from "../src/logging";
+import {initLogging} from "../src/logging";
 
 const MAPPED_PORT = 8080;
 
@@ -11,7 +11,7 @@ describe("qbittorrent container IT", () => {
     let config: Config;
 
     beforeAll(async () => {
-        initLogging(new LogConfig("none"));
+        initLogging({level: "none"});
 
         container = await new GenericContainer("linuxserver/qbittorrent:4.5.2")
             .withExposedPorts(MAPPED_PORT)
