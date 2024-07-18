@@ -2,7 +2,7 @@ import winston from "winston";
 
 const { combine, timestamp, prettyPrint, printf, errors } = winston.format;
 
-export let logger = winston.createLogger();
+export const logger = winston.createLogger();
 
 export class LogConfig {
     constructor(public level: string = "info",

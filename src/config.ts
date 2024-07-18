@@ -24,7 +24,7 @@ export async function generateConfig(configFile: string = ""): Promise<Config> {
     let config = yaml.parse(defaults);
     if (configFile) {
         const external = await readFile(configFile, "utf8");
-        let externalConfig = yaml.parse(external);
+        const externalConfig = yaml.parse(external);
         config = merge(config, externalConfig);
     }
     return config;

@@ -33,14 +33,14 @@ describe("qbittorrent container IT", () => {
 
     test("TorrentHandler can generate SID", async () => {
         const handler = new QBitTorrentHandler(config);
-        let sid = await handler.generateSid();
+        const sid = await handler.generateSid();
         expect(sid).not.toBeNull();
         expect(sid.length > 0).toBeTruthy();
     });
 
     test("TorrentHandler can delete torrent by hash", async () => {
         const handler = new QBitTorrentHandler(config);
-        let sid = await handler.generateSid();
+        const sid = await handler.generateSid();
 
         await handler.addTorrent(sid, path.join(__dirname, "resources", "ubuntu-server.iso.torrent"));
 

@@ -30,7 +30,8 @@ async function main() {
         ]);
 
         logger.info("Command completed successfully");
-    } catch (error: any) {
+    } catch (e: unknown) {
+        const error = e as Error;
         logger.error(error.stack);
     }
 }

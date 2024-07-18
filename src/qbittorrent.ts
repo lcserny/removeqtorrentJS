@@ -30,6 +30,15 @@ export class TorrentInfo {
     }
 }
 
+interface NameSize {
+    name: string;
+    size: number;
+}
+
+interface HashHolder {
+    hash: string;
+}
+
 export class QBitTorrentHandler {
     private readonly videoMimeTypes: string[];
     private webUi: WebUIConfig;
@@ -70,13 +79,13 @@ export class QBitTorrentHandler {
         const headers = new AxiosHeaders();
         headers.set("cookie", `SID=${sid}`);
 
-        const response = await axios.postForm(this.torrentFilesUrl,
+        const response = await axios.postForm<NameSize[]>(this.torrentFilesUrl,
             {hash: hash},
             {headers: headers}
         );
 
         const torrents = response.data
-            .map((data: any) => {
+            .map((data: NameSize) => {
                 const torrent = new TorrentFile(data.name, data.size, false);
                 const filePath = path.join(this.webUi.downloadRootPath, torrent.name);
                 torrent.isMedia = isVideo(filePath, this.videoMimeTypes);
@@ -114,9 +123,9 @@ export class QBitTorrentHandler {
         const headers = new AxiosHeaders();
         headers.set("cookie", `SID=${sid}`);
 
-        const response = await axios.postForm(this.torrentInfoUrl, null,{ headers: headers } );
+        const response = await axios.postForm<HashHolder[]>(this.torrentInfoUrl, null,{ headers: headers } );
 
-        const torrents = response.data.map((data: any) => new TorrentInfo(data.hash));
+        const torrents = response.data.map((data: HashHolder) => new TorrentInfo(data.hash));
 
         logger.info(`Torrent info retrieved: ${JSON.stringify(torrents)}`);
         return torrents;
@@ -126,7 +135,7 @@ export class QBitTorrentHandler {
 function isVideo(filePath: string, videoMimeTypes: string[]) : boolean {
     const fileMime = mime.lookup(filePath);
     if (fileMime) {
-        for (let allowedMime of videoMimeTypes) {
+        for (const allowedMime of videoMimeTypes) {
             if (allowedMime === fileMime) {
                 return true;
             }
