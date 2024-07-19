@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^8.57.0",
     "@types/jest": "^29.5.12",
     "@types/lodash": "^4.17.7",
     "@types/mime-types": "^2.1.4",
