@@ -3,7 +3,7 @@ import axios, {AxiosHeaders} from "axios";
 import mime from "mime-types";
 import path from "node:path";
 import fs from "node:fs";
-import {Config} from "./config";
+import type {Config} from "./config";
 
 axios.defaults.timeout = 5000;
 

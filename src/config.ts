@@ -2,9 +2,9 @@ import yaml from "yaml";
 import {readFile} from "node:fs/promises";
 import {merge} from "lodash";
 import path from "node:path";
-import {LogConfig} from "./logging";
-import {MongoDBConfig} from "./mongo";
-import {TorrentsConfig} from "./qbittorrent";
+import type {LogConfig} from "./logging";
+import type {MongoDBConfig} from "./mongo";
+import type {TorrentsConfig} from "./qbittorrent";
 
 export interface VideoConfig {
     mimeTypes: string[];

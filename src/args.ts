@@ -1,4 +1,5 @@
-import {OptionValues, program} from "commander";
+import type {OptionValues} from "commander";
+import {program} from "commander";
 
 export function processArgs(): OptionValues {
     program

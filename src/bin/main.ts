@@ -3,7 +3,8 @@
 import {initLogging, logger} from "../logging";
 import {processArgs} from "../args";
 import {generateConfig} from "../config";
-import {HistoryClient, HistoryUpdater} from "../history";
+import type {HistoryClient} from "../history";
+import {HistoryUpdater} from "../history";
 import {MongoWrapper} from "../mongo";
 import {QBitTorrentHandler} from "../qbittorrent";
 

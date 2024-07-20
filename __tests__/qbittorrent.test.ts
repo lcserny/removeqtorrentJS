@@ -1,6 +1,8 @@
-import {GenericContainer, StartedTestContainer, Wait} from "testcontainers";
+import type { StartedTestContainer} from "testcontainers";
+import {GenericContainer, Wait} from "testcontainers";
 import * as path from "node:path";
-import {generateConfig, Config} from "../src/config";
+import type { Config} from "../src/config";
+import {generateConfig} from "../src/config";
 import {QBitTorrentHandler} from "../src/qbittorrent";
 import {initLogging} from "../src/logging";
 

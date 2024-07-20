@@ -1,8 +1,8 @@
-import {HistoryClient} from "./history";
+import type {HistoryClient} from "./history";
 import {MongoClient} from "mongodb";
 import {logger} from "./logging";
-import {Config} from "./config";
-import {TorrentFile} from "./qbittorrent";
+import type {Config} from "./config";
+import type {TorrentFile} from "./qbittorrent";
 
 export interface MongoDBConfig {
     connectionUrl: string

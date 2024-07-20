@@ -1,4 +1,4 @@
-import {TorrentFile} from "./qbittorrent";
+import type {TorrentFile} from "./qbittorrent";
 
 export interface HistoryClient {
     updateHistory(torrents: TorrentFile[]): Promise<void>;

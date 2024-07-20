@@ -1,6 +1,8 @@
 import {initLogging} from "../src/logging";
-import {GenericContainer, StartedTestContainer, Wait} from "testcontainers";
-import {generateConfig, Config} from "../src/config";
+import type { StartedTestContainer} from "testcontainers";
+import {GenericContainer, Wait} from "testcontainers";
+import type { Config} from "../src/config";
+import {generateConfig} from "../src/config";
 import {MongoWrapper} from "../src/mongo";
 import {MongoClient} from "mongodb";
 
