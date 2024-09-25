@@ -18,7 +18,7 @@ describe("mongoDB container IT", () => {
     beforeAll(async () => {
         initLogging({level: "none"});
 
-        container = await new GenericContainer("mongo:5.0")
+        container = await new GenericContainer("mongo:7.0")
             .withExposedPorts(MAPPED_PORT)
             .withEnvironment({
                 "MONGO_INITDB_ROOT_USERNAME": USER,
