@@ -23,7 +23,7 @@ export class MagnetUpdater implements MagnetClient {
 
         await collection.findOneAndUpdate(
             { hash: hash },
-            { $set: { downloaded: true } }
+            { $set: { downloaded: true, dateDownloaded: new Date() } }
         );
 
         logger.info(`Magnet with hash '${hash}' updated for collection: '${this.config.magnetCollection}'`);

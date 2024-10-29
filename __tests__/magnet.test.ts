@@ -64,5 +64,6 @@ describe("mongoDB container IT", () => {
         const doc = await collection.findOne();
         expect(doc?.hash).toBe(hash);
         expect(doc?.downloaded).toBe(true);
+        expect((doc?.dateDownloaded as Date).toDateString()).toBe(new Date().toDateString());
     });
 });
