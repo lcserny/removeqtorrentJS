@@ -16,7 +16,7 @@ video:
 
 mongodb:
   connectionUrl: "mongo://changeMe"
-  database: "videosmover"
+  database: "videosmover_dev"
   downloadCollection: "download_cache"
   magnetCollection: "magnet"
 

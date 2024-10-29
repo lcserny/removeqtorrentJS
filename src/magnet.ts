@@ -26,6 +26,6 @@ export class MagnetUpdater implements MagnetClient {
             { $set: { downloaded: true } }
         );
 
-        logger.info(`Magnet with hash ${hash} updated for collection: '${this.config.magnetCollection}'`);
+        logger.info(`Magnet with hash '${hash}' updated for collection: '${this.config.magnetCollection}'`);
     }
 }
