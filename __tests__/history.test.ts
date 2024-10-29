@@ -3,8 +3,8 @@ import type { StartedTestContainer} from "testcontainers";
 import {GenericContainer, Wait} from "testcontainers";
 import type { Config} from "../src/config";
 import {generateConfig} from "../src/config";
-import {MongoWrapper} from "../src/mongo";
 import {MongoClient} from "mongodb";
+import {HistoryUpdater} from "../src/history";
 
 const MAPPED_PORT = 27017;
 const USER = "root";
@@ -47,13 +47,13 @@ describe("mongoDB container IT", () => {
     });
 
     test("can update history", async () => {
-        const wrapper = new MongoWrapper(config);
+        const updater = new HistoryUpdater(client, config.mongodb);
 
         const name = "name1";
         const size = 2;
         const isMedia = true;
 
-        await wrapper.updateHistory([{name, size, isMedia}]);
+        await updater.updateHistory([{name, size, isMedia}]);
 
         const database = client.db(config.mongodb.database);
         const collection = database.collection(config.mongodb.downloadCollection);
@@ -66,13 +66,13 @@ describe("mongoDB container IT", () => {
     });
 
     test("non-media is not updated in history", async () => {
-        const wrapper = new MongoWrapper(config);
+        const updater = new HistoryUpdater(client, config.mongodb);
 
         const name = "nonMedia";
         const size = 2;
         const isMedia = false;
 
-        await wrapper.updateHistory([{name, size, isMedia}]);
+        await updater.updateHistory([{name, size, isMedia}]);
 
         const database = client.db(config.mongodb.database);
         const collection = database.collection(config.mongodb.downloadCollection);

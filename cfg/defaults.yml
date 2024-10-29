@@ -18,7 +18,8 @@ mongodb:
   connectionUrl: "mongo://changeMe"
   database: "videosmover"
   downloadCollection: "download_cache"
-  
+  magnetCollection: "magnet"
+
 torrents:
   webUi:
     baseUrl: "<qTorrentBaseUrl>"

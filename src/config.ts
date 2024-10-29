@@ -1,9 +1,8 @@
-import yaml from "yaml";
+import * as yaml from "yaml";
 import {readFile} from "node:fs/promises";
 import {merge} from "lodash";
-import path from "node:path";
+import * as path from "node:path";
 import type {LogConfig} from "./logging";
-import type {MongoDBConfig} from "./mongo";
 import type {TorrentsConfig} from "./qbittorrent";
 
 export interface VideoConfig {
@@ -15,6 +14,13 @@ export interface Config {
     video: VideoConfig;
     mongodb: MongoDBConfig;
     torrents: TorrentsConfig;
+}
+
+export interface MongoDBConfig {
+    connectionUrl: string
+    database: string;
+    downloadCollection: string;
+    magnetCollection: string;
 }
 
 export async function generateConfig(configFile: string = ""): Promise<Config> {
