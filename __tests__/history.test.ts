@@ -3,7 +3,8 @@ import type { StartedTestContainer} from "testcontainers";
 import {GenericContainer, Wait} from "testcontainers";
 import type { Config} from "../src/config";
 import {generateConfig} from "../src/config";
-import {MongoClient} from "mongodb";
+import type {Document} from "mongodb";
+import { MongoClient} from "mongodb";
 import {HistoryUpdater} from "../src/history";
 
 const MAPPED_PORT = 27017;
@@ -53,16 +54,17 @@ describe("mongoDB container IT", () => {
         const size = 2;
         const isMedia = true;
 
-        await updater.updateHistory([{name, size, isMedia}]);
+        await updater.updateHistoryDownloaded([{name, size, isMedia}]);
 
         const database = client.db(config.mongodb.database);
         const collection = database.collection(config.mongodb.downloadCollection);
 
-        expect(await collection.countDocuments()).toBe(1);
+        expect(await collection.countDocuments({ file_name: name })).toBe(1);
 
-        const doc = await collection.findOne();
-        expect(doc?.file_name).toBe(name);
-        expect(doc?.file_size).toBe(size);
+        const docs: Document[] = await collection.find({ file_name: name }).toArray();
+        expect(docs[0].file_name).toBe(name);
+        expect(docs[0].file_size).toBe(size);
+        expect(docs[0].download_complete).toBeTruthy();
     });
 
     test("non-media is not updated in history", async () => {
@@ -72,7 +74,7 @@ describe("mongoDB container IT", () => {
         const size = 2;
         const isMedia = false;
 
-        await updater.updateHistory([{name, size, isMedia}]);
+        await updater.updateHistoryDownloaded([{name, size, isMedia}]);
 
         const database = client.db(config.mongodb.database);
         const collection = database.collection(config.mongodb.downloadCollection);
@@ -81,5 +83,25 @@ describe("mongoDB container IT", () => {
             file_name: name,
             file_size: size
         })).toBe(0);
+    });
+
+    test("can update history only for added", async () => {
+        const updater = new HistoryUpdater(client, config.mongodb);
+
+        const name = "name4";
+        const size = 2;
+        const isMedia = true;
+
+        await updater.updateHistoryAdded([{name, size, isMedia}]);
+
+        const database = client.db(config.mongodb.database);
+        const collection = database.collection(config.mongodb.downloadCollection);
+
+        expect(await collection.countDocuments({ file_name: name })).toBe(1);
+
+        const docs: Document[] = await collection.find({ file_name: name }).toArray();
+        expect(docs[0].file_name).toBe(name);
+        expect(docs[0].file_size).toBe(size);
+        expect(docs[0].download_complete).toBeFalsy();
     });
 });
