@@ -104,4 +104,31 @@ describe("mongoDB container IT", () => {
         expect(docs[0].file_size).toBe(size);
         expect(docs[0].download_complete).toBeFalsy();
     });
+
+    test("update history for added then completed", async () => {
+        const updater = new HistoryUpdater(client, config.mongodb);
+
+        const name = "name for update and complete";
+        const size = 3;
+        const isMedia = true;
+
+        await updater.updateHistoryAdded([{name, size, isMedia}]);
+
+        const database = client.db(config.mongodb.database);
+        const collection = database.collection(config.mongodb.downloadCollection);
+
+        const docs: Document[] = await collection.find({ file_name: name }).toArray();
+        expect(docs.length).toBe(1);
+        expect(docs[0].file_name).toBe(name);
+        expect(docs[0].file_size).toBe(size);
+        expect(docs[0].download_complete).toBeFalsy();
+
+        await updater.updateHistoryDownloaded([{name, size, isMedia}]);
+
+        const docsAfter: Document[] = await collection.find({ file_name: name }).toArray();
+        expect(docsAfter.length).toBe(1);
+        expect(docsAfter[0].file_name).toBe(name);
+        expect(docsAfter[0].file_size).toBe(size);
+        expect(docsAfter[0].download_complete).toBeTruthy();
+    });
 });

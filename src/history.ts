@@ -42,27 +42,25 @@ export class HistoryUpdater implements HistoryClient{
 
         const operations: AnyBulkWriteOperation[] = torrents
             .filter(torrent => torrent.isMedia)
-            .map((torrent) => ({
+            .map(torrent => ({
                 file_name: torrent.name,
                 file_size: torrent.size,
                 date_downloaded: new Date(),
                 download_complete: downloaded,
             } as DownloadedMedia))
-            .map((dm) => ({
+            .map(dm => ({
                 updateOne: {
                     filter: {
                         file_name: dm.file_name,
                         file_size: dm.file_size,
                     },
-                    update: {
-                        $setOnInsert: dm
-                    },
+                    update: {$set: dm},
                     upsert: true,
                 }
-            } as AnyBulkWriteOperation));
+            }));
 
         if (operations == null || operations.length < 1) {
-            logger.info("No media files found to insert in cache");
+            logger.info("No media files found to upsert in cache");
             return;
         }
 
