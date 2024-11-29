@@ -8,6 +8,7 @@ interface DownloadedMedia {
     file_size: number;
     date_downloaded: Date;
     download_complete: boolean;
+    tried_automove: boolean;
 }
 
 export interface HistoryClient {
@@ -46,6 +47,7 @@ export class HistoryUpdater implements HistoryClient{
                 file_name: torrent.name,
                 file_size: torrent.size,
                 date_downloaded: new Date(),
+                tried_automove: false,
                 download_complete: downloaded,
             } as DownloadedMedia))
             .map(dm => ({
